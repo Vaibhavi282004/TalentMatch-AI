@@ -1,0 +1,18 @@
+{% extends "screening/base.html" %}
+{% block title %}History{% endblock %}
+{% block body %}
+<section class="head"><h1>History</h1><div class="meta"><span>Every screening you have run</span></div></section>
+<div class="panel">
+  {% for s in screenings %}
+  <div class="hrow">
+    <div><a class="t" href="{% url 'results' s.pk %}">{{ s }}</a>
+      <div class="muted">{{ s.created_at|date:"d M Y, H:i" }}, {{ s.candidates.count }} resume{{ s.candidates.count|pluralize }}</div></div>
+    <form method="post" action="{% url 'delete_screening' s.pk %}" onsubmit="return confirm('Delete this screening?')">
+      {% csrf_token %}<button class="btn danger sm" type="submit">Delete</button>
+    </form>
+  </div>
+  {% empty %}
+  <p class="muted" style="margin:0">Nothing here yet. <a href="{% url 'home' %}">Start a screening</a>.</p>
+  {% endfor %}
+</div>
+{% endblock %}

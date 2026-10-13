@@ -1,0 +1,28 @@
+{% load static %}<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}AI Resume Screening{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'screening/style.css' %}">
+</head>
+<body>
+  {% url 'dashboard' as u_dash %}{% url 'home' as u_new %}{% url 'history' as u_hist %}
+  <aside class="side">
+    <a class="brand" href="{{ u_dash }}"><i></i>Resume Screening</a>
+    <nav>
+      <a href="{{ u_dash }}"{% if request.path == u_dash %} class="on"{% endif %}>
+        <svg viewBox="0 0 24 24"><path d="M3 3h8v8H3zM13 3h8v5h-8zM13 10h8v11h-8zM3 13h8v8H3z"/></svg>Dashboard</a>
+      <a href="{{ u_new }}"{% if request.path == u_new %} class="on"{% endif %}>
+        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>New screening</a>
+      <a href="{{ u_hist }}"{% if request.path == u_hist %} class="on"{% endif %}>
+        <svg viewBox="0 0 24 24"><path d="M12 7v5l3 2M3 12a9 9 0 1 0 3-6.7M3 4v4h4"/></svg>History</a>
+    </nav>
+    <p class="side-note">Uploaded PDFs are read in memory and never saved.</p>
+  </aside>
+  <div class="main"><div class="wrap">{% block body %}{% endblock %}</div></div>
+</body>
+</html>

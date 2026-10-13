@@ -1,0 +1,44 @@
+{% extends "screening/base.html" %}
+{% block title %}{{ screening }} - Results{% endblock %}
+{% block body %}
+<section class="head">
+  <h1>{{ screening }}</h1>
+  <div class="meta">
+    <span>{{ screening.created_at|date:"d M Y, H:i" }}</span>
+    <span>{{ ok|length }} ranked</span>
+    <span>{% if screening.used_embeddings %}TF-IDF and embeddings{% else %}TF-IDF only{% endif %}</span>
+  </div>
+  {% if jd_skills %}
+  <div class="tags">{% for s in jd_skills %}<span class="tag">{{ s }}</span>{% endfor %}</div>
+  {% endif %}
+  <div class="actions">
+    <a class="btn" href="{% url 'export_csv' screening.pk %}">Download CSV</a>
+    <a class="btn ghost" href="{% url 'home' %}">New screening</a>
+  </div>
+</section>
+
+{% for c in ok %}
+<article class="cand{% if forloop.first %} first{% endif %}">
+  <div class="ring" style="--p:{{ c.score|stringformat:'.1f' }};--c:{% if c.score >= 60 %}var(--good){% elif c.score >= 40 %}var(--mid){% else %}var(--low){% endif %}">
+    <b>{{ c.score|floatformat:0 }}<small>%</small></b>
+  </div>
+  <div>
+    <div class="cname"><strong>{{ c.filename }}</strong><span class="rk">{% if forloop.first %}Best match{% else %}Rank {{ forloop.counter }}{% endif %}</span></div>
+    <div class="sub">TF-IDF {{ c.tfidf }}%{% if c.embedding is not None %}, embeddings {{ c.embedding }}%{% endif %}</div>
+    <div class="tags">
+      {% for s in c.matched %}<span class="tag ok">{{ s }}</span>{% endfor %}
+      {% for s in c.missing %}<span class="tag miss">missing {{ s }}</span>{% endfor %}
+    </div>
+  </div>
+</article>
+{% empty %}
+<div class="panel"><p class="muted" style="margin:0">No resumes could be scored. Check the messages below.</p></div>
+{% endfor %}
+
+{% if failed %}
+<section class="panel" style="margin-top:22px">
+  <h2>Could not process</h2>
+  {% for c in failed %}<div class="err" style="margin:10px 0 0"><b>{{ c.filename }}</b>: {{ c.error }}</div>{% endfor %}
+</section>
+{% endif %}
+{% endblock %}

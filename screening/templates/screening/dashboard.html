@@ -1,0 +1,60 @@
+{% extends "screening/base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block body %}
+<section class="head">
+  <h1>Dashboard</h1>
+  <div class="meta"><span>Everything you have screened so far</span></div>
+  <div class="actions"><a class="btn" href="{% url 'home' %}">New screening</a></div>
+</section>
+
+<section class="stats panel">
+  <div><b>{{ n_screenings }}</b><span>Screenings run</span></div>
+  <div><b>{{ n_resumes }}</b><span>Resumes scored</span></div>
+  <div><b>{% if avg is not None %}{{ avg }}<small>%</small>{% else %}-{% endif %}</b><span>Average match</span></div>
+  <div><b>{% if best is not None %}{{ best|floatformat:1 }}<small>%</small>{% else %}-{% endif %}</b><span>Best match</span></div>
+</section>
+
+{% if n_resumes %}
+<div class="two">
+  <section class="panel">
+    <h2>Skills candidates have</h2>
+    <p class="muted">Matched against job descriptions, most frequent first</p>
+    {% for s in top_matched %}
+    <div class="sk"><span>{{ s.name }}</span><div class="track"><i class="good" style="width:{{ s.pct }}%"></i></div><em>{{ s.n }}</em></div>
+    {% empty %}<p class="muted">No skills matched yet.</p>{% endfor %}
+  </section>
+  <section class="panel">
+    <h2>Skills most often missing</h2>
+    <p class="muted">Required by job descriptions but absent from resumes</p>
+    {% for s in top_missing %}
+    <div class="sk"><span>{{ s.name }}</span><div class="track"><i class="low" style="width:{{ s.pct }}%"></i></div><em>{{ s.n }}</em></div>
+    {% empty %}<p class="muted">Nothing missing so far.</p>{% endfor %}
+  </section>
+</div>
+
+<section class="panel">
+  <h2>How candidates scored</h2>
+  <div class="stack">{% for d in dist %}{% if d.pct %}<i class="{{ d.cls }}" style="width:{{ d.pct }}%"></i>{% endif %}{% endfor %}</div>
+  <div class="legend">
+    {% for d in dist %}<div><i class="dot {{ d.cls }}"></i>{{ d.label }}<em>{{ d.n }} ({{ d.pct }}%)</em></div>{% endfor %}
+  </div>
+</section>
+
+<section class="panel">
+  <h2>Recent screenings</h2>
+  {% for s in recent %}
+  <div class="hrow">
+    <div><a class="t" href="{% url 'results' s.pk %}">{{ s }}</a>
+      <div class="muted">{{ s.created_at|date:"d M Y, H:i" }}, {{ s.cnt }} resume{{ s.cnt|pluralize }}</div></div>
+    <div class="topscore">{% if s.top is not None %}{{ s.top|floatformat:0 }}<small>% top</small>{% endif %}</div>
+  </div>
+  {% endfor %}
+</section>
+{% else %}
+<section class="panel empty">
+  <h2>No screenings yet</h2>
+  <p class="muted">Add a job description and a few PDF resumes. Your results and skill trends will show up here.</p>
+  <a class="btn" href="{% url 'home' %}">Start your first screening</a>
+</section>
+{% endif %}
+{% endblock %}

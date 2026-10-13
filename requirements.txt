@@ -1,0 +1,5 @@
+django>=5.0
+pdfplumber
+scikit-learn
+pandas
+sentence-transformers
